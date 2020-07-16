@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1169
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScLint", "src\ScLint\ScLint.csproj", "{3C804C36-C091-482A-982B-20A5BF52C1DE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScLint.Vsix", "src\ScLint.Vsix\ScLint.Vsix.csproj", "{A0C753E1-D31A-4CD1-A2CB-C0C420F61EB7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3C804C36-C091-482A-982B-20A5BF52C1DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C804C36-C091-482A-982B-20A5BF52C1DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C804C36-C091-482A-982B-20A5BF52C1DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C804C36-C091-482A-982B-20A5BF52C1DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0C753E1-D31A-4CD1-A2CB-C0C420F61EB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0C753E1-D31A-4CD1-A2CB-C0C420F61EB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0C753E1-D31A-4CD1-A2CB-C0C420F61EB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0C753E1-D31A-4CD1-A2CB-C0C420F61EB7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {66DBDECE-A64E-4489-9AD6-FECE0F95C03B}
+	EndGlobalSection
+EndGlobal
