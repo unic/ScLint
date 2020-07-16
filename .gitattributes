@@ -1,0 +1,10 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Custom for Visual Studio
+*.cs diff=csharp
+
+## Sitecore specific settings ##
+# unset the text attribute and prevent git from normalizing serialized files
+*.item -text
+*.role -text 
