@@ -21,6 +21,7 @@ Repository's directory "src" contains "Roslyn" folder where C# solution "ScLint"
 | 4. | ScLint4 | Do not use GUIDs of unknown items | Rule checks if GUIDs are used as method arguments or as attributes in code - then reports a warning. GUIDs can be provided only while assigning to variables.<br>Type: warning | HardCodedGuids |
 | 5. | ScLint5 | Do not use hard coded image paths | Rule checks if paths to media library items are used direct (being not wrapped in variables) in methods as parameters. This approach is reported as a warning since paths should be assigned to variables to suggest which items they are referring to.<br>Type: warning |  HardCodedImagePaths |
 | 6. | ScLint6 | Limit use of Sitecore Query | Every occurrence of string containing <em>query:/</em> phrase is listed as possible Sitecore query and suggestion to change the way of referencing items is displayed.<br>Type: warning | QueryLimit
+| 7. | ScLint7 | Limit use of Sitecore API get items methods | <em>GetAncestors</em> and <em>GetDescendants</em> methods are highlighted for discarding them and replacing with other ways of item getting.<br>Type: warning | GetMethodsLimit
 
 ## Development
 
