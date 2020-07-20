@@ -20,6 +20,7 @@ Repository's directory "src" contains "Roslyn" folder where C# solution "ScLint"
 | 3. | ScLint3 | Do not use hard coded paths to get Sitecore items | Rule checks variable declarations and return statements to catch all occurrences of obsolete way of referencing items - searching them by providing their paths and using following methods: <i>GetItem</i>, <i>GetRootItem</i>, <i>SelectItems</i>, <i>SelectItemsUsingXPath</i>, <i>SelectSingleItem</i>,  <i>SelectSingleItemUsingXPath</i>. Code analyzer suggests to give items' guids instead of paths and to use other methods to get them.<br>Type: warning | HardCodedPaths |
 | 4. | ScLint4 | Do not use GUIDs of unknown items | Rule checks if GUIDs are used as method arguments or as attributes in code - then reports a warning. GUIDs can be provided only while assigning to variables.<br>Type: warning | HardCodedGuids |
 | 5. | ScLint5 | Do not use hard coded image paths | Rule checks if paths to media library items are used direct (being not wrapped in variables) in methods as parameters. This approach is reported as a warning since paths should be assigned to variables to suggest which items they are referring to.<br>Type: warning |  HardCodedImagePaths |
+| 6. | ScLint6 | Limit use of Sitecore Query | Every occurrence of string containing <em>query:/</em> phrase is listed as possible Sitecore query and suggestion to change the way of referencing items is displayed.<br>Type: warning | QueryLimit
 
 ## Development
 
