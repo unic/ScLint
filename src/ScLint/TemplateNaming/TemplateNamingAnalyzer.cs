@@ -10,7 +10,7 @@ namespace TemplateNaming
     public class TemplateNamingAnalyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "ScLint8";
-        public static string Title = "Change to \"TemplateId\"";
+        public static string Title = "Change to \"TemplateID\"";
         private const string MessageFormat = "Template variable name is ambiguous";
         private const string Category = "Make template naming more explicit";
 
