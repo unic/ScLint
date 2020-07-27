@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -31,7 +32,8 @@ namespace TemplateNaming
 
             if (regEx.Match(nodeText).Success)
             {
-                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation()));
+                var identifierToken = context.Node.DescendantTokens().FirstOrDefault();
+                context.ReportDiagnostic(Diagnostic.Create(Rule, identifierToken.GetLocation()));
             }
         }
     }
