@@ -10,7 +10,7 @@ namespace HardCodedPaths
     public class HardCodedPathsAnalyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "ScLint3";
-        private const string Title = "Sitecore item is referenced in obsolete way - use different method";
+        private const string Title = "Getting Sitecore items with the use of Sitecore.Context.Database namespace method is an obsolete way - use different method";
         private const string Category = "Obsolete way of getting Sitecore items";
 
         private static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, Title, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Title);

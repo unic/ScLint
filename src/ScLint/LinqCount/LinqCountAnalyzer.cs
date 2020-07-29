@@ -11,7 +11,7 @@ namespace LinqCount
     {
         public const string DiagnosticId = "ScLint10";
         public static string Title = "Change to \"Any()\"";
-        private const string MessageFormat = "Use different method to check whether this collection is empty or not";
+        private const string MessageFormat = "Use \"Any()\" method to check whether this collection is empty or not";
         private const string Category = "Use more briefly method";
 
         private static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Title);

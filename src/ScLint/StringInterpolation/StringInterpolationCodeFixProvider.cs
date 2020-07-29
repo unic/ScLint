@@ -1,17 +1,17 @@
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CodeFixes;
 using System.Collections.Immutable;
 using System.Composition;
 using System.Threading.Tasks;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CodeFixes;
 
-namespace TemplateNaming
+namespace StringInterpolation
 {
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(TemplateNamingCodeFixProvider)), Shared]
-    public class TemplateNamingCodeFixProvider : CodeFixProvider
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(StringInterpolationCodeFixProvider)), Shared]
+    public class StringInterpolationCodeFixProvider : CodeFixProvider
     {
         public sealed override ImmutableArray<string> FixableDiagnosticIds
         {
-            get { return ImmutableArray.Create(TemplateNamingAnalyzer.DiagnosticId); }
+            get { return ImmutableArray.Create(StringInterpolationAnalyzer.DiagnosticId); }
         }
 
         public sealed override FixAllProvider GetFixAllProvider()

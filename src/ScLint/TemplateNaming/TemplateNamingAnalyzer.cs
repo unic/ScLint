@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -11,28 +12,27 @@ namespace TemplateNaming
     public class TemplateNamingAnalyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "ScLint8";
-        public static string Title = "Change to \"TemplateID\"";
-        private const string MessageFormat = "Template variable name is ambiguous";
+        private const string PropertyMatchName = "TemplateName";
+        public static string Title = $"Change to \"TemplateID\"";
         private const string Category = "Make template naming more explicit";
 
-        private static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Title);
+        private static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, Title, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Title);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
 
         public override void Initialize(AnalysisContext context)
         {
-            context.RegisterSyntaxNodeAction(AnalyzeNode, SyntaxKind.VariableDeclarator);
+            context.RegisterSyntaxNodeAction(AnalyzeNode, SyntaxKind.SimpleMemberAccessExpression);
         }
 
         private void AnalyzeNode(SyntaxNodeAnalysisContext context)
         {
-            var nodeText = context.Node.GetText().ToString().ToLower();
-
-            Regex regEx = new Regex("templatename");
+            var nodeText = context.Node.GetText().ToString();
+            Regex regEx = new Regex(PropertyMatchName);
 
             if (regEx.Match(nodeText).Success)
             {
-                var identifierToken = context.Node.DescendantTokens().FirstOrDefault();
+                var identifierToken = context.Node.DescendantTokens().FirstOrDefault(x => x.Text.Equals(PropertyMatchName));
                 context.ReportDiagnostic(Diagnostic.Create(Rule, identifierToken.GetLocation()));
             }
         }

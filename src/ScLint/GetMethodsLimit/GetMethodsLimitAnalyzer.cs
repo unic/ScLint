@@ -10,7 +10,7 @@ namespace GetMethodsLimit
     class GetMethodsLimitAnalyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "ScLint7";
-        private const string Title = "Consider getting Sitecore items with the use of other methods";
+        private const string Title = "Consider getting Sitecore items with the use of methods other than \"GetAncestors()\" and \"GetDescendants()\"";
         private const string Category = "Limit use of get methods API calls";
 
         private static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, Title, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Title);
