@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
 using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace StringInterpolation
 {
@@ -10,8 +11,8 @@ namespace StringInterpolation
     class StringInterpolationAnalyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "ScLint11";
-        private const string Title = "Interpolate this string";
-        private const string MessageFormat = "It is more briefly to inerpolate this string";
+        public const string Title = "Interpolate this string";
+        private const string MessageFormat = "It is more briefly to interpolate this string";
         private const string Category = "String interpolation";
 
         private static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, Title, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Title);
@@ -19,12 +20,18 @@ namespace StringInterpolation
 
         public override void Initialize(AnalysisContext context)
         {
-            context.RegisterSyntaxNodeAction(AnalyzeNode, SyntaxKind.StringLiteralExpression);
+            context.RegisterSyntaxNodeAction(AnalyzeNode, SyntaxKind.AddExpression);
         }
 
         private static void AnalyzeNode(SyntaxNodeAnalysisContext context)
         {
-           
+            if (context.Node.DescendantTokens().Any(x => x.IsKind(SyntaxKind.IdentifierToken)))
+            {
+                if (!context.Node.Parent.IsKind(SyntaxKind.AddExpression))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation()));
+                }
+            }
         }
     }
 }
