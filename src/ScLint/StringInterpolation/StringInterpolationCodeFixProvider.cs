@@ -3,7 +3,6 @@ using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Composition;
@@ -44,9 +43,7 @@ namespace StringInterpolation
 
         private async Task<Document> ModifyString(Document document, SyntaxNode root, SyntaxNode nodeToChange)
         {
-            SyntaxNode newNode = nodeToChange;
-
-            IEnumerable<SyntaxNode> childNodes = newNode.DescendantNodes().Where(x => !x.IsKind(SyntaxKind.AddExpression) && !x.Parent.IsKind(SyntaxKind.SimpleMemberAccessExpression) && x.DescendantTokens().Any());
+            IEnumerable<SyntaxNode> childNodes = nodeToChange.DescendantNodes().Where(x => !x.IsKind(SyntaxKind.AddExpression) && !x.Parent.IsKind(SyntaxKind.SimpleMemberAccessExpression) && !x.Parent.IsKind(SyntaxKind.InvocationExpression) && x.DescendantTokens().Any());
 
             StringBuilder newNodeText = new StringBuilder("$\"");
 
@@ -66,7 +63,8 @@ namespace StringInterpolation
             newNodeText.Append("\"");
 
             SyntaxToken newToken = SyntaxFactory.Literal(default(SyntaxTriviaList), newNodeText.ToString(), newNodeText.ToString(), default(SyntaxTriviaList));
-            newNode = SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, newToken);
+
+            SyntaxNode newNode = SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, newToken);
 
             SyntaxNode newRoot = root.ReplaceNode(nodeToChange, newNode);
 
