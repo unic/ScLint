@@ -33,32 +33,60 @@ namespace NullStrings
             TextSpan diagnosticSpan = diagnostic.Location.SourceSpan;
             SyntaxNode nodeToChange = root.FindNode(diagnosticSpan, findInsideTrivia: true);
 
-            context.RegisterCodeFix(
+            var semanticModel = context.Document.GetSemanticModelAsync().Result;
+            var investigatedToken = nodeToChange.DescendantNodes().OfType<IdentifierNameSyntax>().FirstOrDefault();
+            string typeName = semanticModel.GetTypeInfo(investigatedToken).Type.Name;
+
+            if (typeName == typeof(String).Name.ToString())
+            {
+                context.RegisterCodeFix(
+                    CodeAction.Create(
+                        title: NullStringsAnalyzer.TitleStringEmptyCase,
+                        createChangedDocument: c => ModifyStringEmpty(context.Document, root, nodeToChange),
+                        equivalenceKey: NullStringsAnalyzer.TitleStringEmptyCase),
+                    diagnostic);
+
+                context.RegisterCodeFix(
+                    CodeAction.Create(
+                        title: NullStringsAnalyzer.TitleStringWhiteSpaceCase,
+                        createChangedDocument: c => ModifyStringWhiteSpace(context.Document, root, nodeToChange),
+                        equivalenceKey: NullStringsAnalyzer.TitleStringWhiteSpaceCase),
+                    diagnostic);
+            }
+            else
+            {
+                context.RegisterCodeFix(
                 CodeAction.Create(
-                    title: NullStringsAnalyzer.Title,
+                    title: NullStringsAnalyzer.TitleObjectCase,
                     createChangedDocument: c => ModifyExpression(context.Document, root, nodeToChange),
-                    equivalenceKey: NullStringsAnalyzer.Title),
+                    equivalenceKey: NullStringsAnalyzer.TitleObjectCase),
                 diagnostic);
+            }
+        }
+
+        private async Task<Document> ModifyStringEmpty(Document document, SyntaxNode root, SyntaxNode nodeToChange)
+        {
+            string newTokenText = $"string.IsNullOrEmpty({nodeToChange.DescendantTokens().FirstOrDefault()})";    
+            
+            SyntaxToken newToken = SyntaxFactory.Literal(default(SyntaxTriviaList), newTokenText, newTokenText, default(SyntaxTriviaList));
+            SyntaxNode newNode = SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, newToken);
+            SyntaxNode newRoot = root.ReplaceNode(nodeToChange, newNode);
+            return document.WithSyntaxRoot(newRoot);
+        }
+
+        private async Task<Document> ModifyStringWhiteSpace(Document document, SyntaxNode root, SyntaxNode nodeToChange)
+        {
+            string newTokenText = $"string.IsNullOrWhiteSpace({nodeToChange.DescendantTokens().FirstOrDefault()})";
+
+            SyntaxToken newToken = SyntaxFactory.Literal(default(SyntaxTriviaList), newTokenText, newTokenText, default(SyntaxTriviaList));
+            SyntaxNode newNode = SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, newToken);
+            SyntaxNode newRoot = root.ReplaceNode(nodeToChange, newNode);
+            return document.WithSyntaxRoot(newRoot);
         }
 
         private async Task<Document> ModifyExpression(Document document, SyntaxNode root, SyntaxNode nodeToChange)
         {
-            var investigatedToken = nodeToChange.DescendantNodes().OfType<IdentifierNameSyntax>().FirstOrDefault();
-
-            var semanticModel = document.GetSemanticModelAsync().Result;
-
-            string typeName = semanticModel.GetTypeInfo(investigatedToken).Type.Name;
-
-            string newTokenText;
-
-            if (typeName == typeof(String).Name.ToString())
-            {
-                newTokenText = $"string.IsNullOrEmpty({nodeToChange.DescendantTokens().FirstOrDefault()})";    
-            }
-            else
-            {
-                newTokenText = $"{nodeToChange.DescendantTokens().FirstOrDefault()} is null";
-            }
+            string newTokenText = $"{nodeToChange.DescendantTokens().FirstOrDefault()} is null";
 
             SyntaxToken newToken = SyntaxFactory.Literal(default(SyntaxTriviaList), newTokenText, newTokenText, default(SyntaxTriviaList));
             SyntaxNode newNode = SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, newToken);

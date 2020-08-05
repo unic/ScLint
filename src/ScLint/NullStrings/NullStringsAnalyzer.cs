@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
@@ -9,9 +10,11 @@ namespace NullStrings
     class NullStringsAnalyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "ScLint12";
-        public const string Title = "Replace this expression with 'IsNullOrEmpty' or 'IsNullOrWhiteSpace' method";
-        private const string MessageFormat = "Use 'IsNullOrEmpty' or 'IsNullOrWhiteSpace' method";
-        private const string Category = "Null string check";
+        public const string Title = "Use different method to check whether object is null";
+        public const string TitleObjectCase = "Use 'is' operator";
+        public const string TitleStringEmptyCase = "Use 'IsNullOrEmpty' method";
+        public const string TitleStringWhiteSpaceCase = "Use 'IsNullOrWhiteSpace' method";
+        private const string Category = "Null object check";
 
         private static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, Title, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Title);
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
