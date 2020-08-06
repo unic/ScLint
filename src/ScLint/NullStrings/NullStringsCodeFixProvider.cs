@@ -34,6 +34,8 @@ namespace NullStrings
             TextSpan diagnosticSpan = diagnostic.Location.SourceSpan;
             SyntaxNode nodeToChange = root.FindNode(diagnosticSpan, findInsideTrivia: true);
 
+            bool negation = nodeToChange.DescendantTokens().Any(x => x.IsKind(SyntaxKind.ExclamationEqualsToken));
+
             var semanticModel = context.Document.GetSemanticModelAsync().Result;
             var investigatedToken = nodeToChange.DescendantNodes().OfType<IdentifierNameSyntax>().FirstOrDefault();
             string typeName = semanticModel.GetTypeInfo(investigatedToken).Type.Name;
@@ -43,14 +45,14 @@ namespace NullStrings
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         title: NullStringsAnalyzer.TitleStringEmptyCase,
-                        createChangedDocument: c => ModifyExpression(context.Document, root, nodeToChange, "stringEmpty"),
+                        createChangedDocument: c => ModifyExpression(context.Document, root, nodeToChange, negation, "stringEmpty"),
                         equivalenceKey: NullStringsAnalyzer.TitleStringEmptyCase),
                     diagnostic);
 
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         title: NullStringsAnalyzer.TitleStringWhiteSpaceCase,
-                        createChangedDocument: c => ModifyExpression(context.Document, root, nodeToChange, "stringWhitespace"),
+                        createChangedDocument: c => ModifyExpression(context.Document, root, nodeToChange, negation, "stringWhitespace"),
                         equivalenceKey: NullStringsAnalyzer.TitleStringWhiteSpaceCase),
                     diagnostic);
             }
@@ -59,26 +61,26 @@ namespace NullStrings
                 context.RegisterCodeFix(
                 CodeAction.Create(
                     title: NullStringsAnalyzer.TitleObjectCase,
-                    createChangedDocument: c => ModifyExpression(context.Document, root, nodeToChange),
+                    createChangedDocument: c => ModifyExpression(context.Document, root, nodeToChange, negation),
                     equivalenceKey: NullStringsAnalyzer.TitleObjectCase),
                 diagnostic);
             }
         }
 
-        private async Task<Document> ModifyExpression(Document document, SyntaxNode root, SyntaxNode nodeToChange, [Optional] string type)
+        private async Task<Document> ModifyExpression(Document document, SyntaxNode root, SyntaxNode nodeToChange, bool negation, [Optional] string type)
         {
             string newTokenText;
 
             switch (type)
             {
                 case "stringEmpty":
-                    newTokenText = $"string.IsNullOrEmpty({nodeToChange.DescendantTokens().FirstOrDefault()})";
+                    newTokenText = negation ? $"!string.IsNullOrEmpty({nodeToChange.DescendantTokens().FirstOrDefault()})" : $"string.IsNullOrEmpty({nodeToChange.DescendantTokens().FirstOrDefault()})";
                     break;
                 case "stringWhitespace":
-                    newTokenText = $"string.IsNullOrWhiteSpace({nodeToChange.DescendantTokens().FirstOrDefault()})";
+                    newTokenText = negation ? $"!string.IsNullOrWhiteSpace({nodeToChange.DescendantTokens().FirstOrDefault()})" : $"string.IsNullOrWhiteSpace({nodeToChange.DescendantTokens().FirstOrDefault()})";
                     break;
                 default:
-                    newTokenText = $"{nodeToChange.DescendantTokens().FirstOrDefault()} is null";
+                    newTokenText = negation ? $"!({nodeToChange.DescendantTokens().FirstOrDefault()} is null)" : $"{nodeToChange.DescendantTokens().FirstOrDefault()} is null";
                     break;
             } 
             
