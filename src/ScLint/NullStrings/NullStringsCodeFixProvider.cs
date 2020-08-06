@@ -8,6 +8,7 @@ using System;
 using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace NullStrings
@@ -42,14 +43,14 @@ namespace NullStrings
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         title: NullStringsAnalyzer.TitleStringEmptyCase,
-                        createChangedDocument: c => ModifyStringEmpty(context.Document, root, nodeToChange),
+                        createChangedDocument: c => ModifyExpression(context.Document, root, nodeToChange, "stringEmpty"),
                         equivalenceKey: NullStringsAnalyzer.TitleStringEmptyCase),
                     diagnostic);
 
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         title: NullStringsAnalyzer.TitleStringWhiteSpaceCase,
-                        createChangedDocument: c => ModifyStringWhiteSpace(context.Document, root, nodeToChange),
+                        createChangedDocument: c => ModifyExpression(context.Document, root, nodeToChange, "stringWhitespace"),
                         equivalenceKey: NullStringsAnalyzer.TitleStringWhiteSpaceCase),
                     diagnostic);
             }
@@ -64,30 +65,23 @@ namespace NullStrings
             }
         }
 
-        private async Task<Document> ModifyStringEmpty(Document document, SyntaxNode root, SyntaxNode nodeToChange)
+        private async Task<Document> ModifyExpression(Document document, SyntaxNode root, SyntaxNode nodeToChange, [Optional] string type)
         {
-            string newTokenText = $"string.IsNullOrEmpty({nodeToChange.DescendantTokens().FirstOrDefault()})";    
+            string newTokenText;
+
+            switch (type)
+            {
+                case "stringEmpty":
+                    newTokenText = $"string.IsNullOrEmpty({nodeToChange.DescendantTokens().FirstOrDefault()})";
+                    break;
+                case "stringWhitespace":
+                    newTokenText = $"string.IsNullOrWhiteSpace({nodeToChange.DescendantTokens().FirstOrDefault()})";
+                    break;
+                default:
+                    newTokenText = $"{nodeToChange.DescendantTokens().FirstOrDefault()} is null";
+                    break;
+            } 
             
-            SyntaxToken newToken = SyntaxFactory.Literal(default(SyntaxTriviaList), newTokenText, newTokenText, default(SyntaxTriviaList));
-            SyntaxNode newNode = SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, newToken);
-            SyntaxNode newRoot = root.ReplaceNode(nodeToChange, newNode);
-            return document.WithSyntaxRoot(newRoot);
-        }
-
-        private async Task<Document> ModifyStringWhiteSpace(Document document, SyntaxNode root, SyntaxNode nodeToChange)
-        {
-            string newTokenText = $"string.IsNullOrWhiteSpace({nodeToChange.DescendantTokens().FirstOrDefault()})";
-
-            SyntaxToken newToken = SyntaxFactory.Literal(default(SyntaxTriviaList), newTokenText, newTokenText, default(SyntaxTriviaList));
-            SyntaxNode newNode = SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, newToken);
-            SyntaxNode newRoot = root.ReplaceNode(nodeToChange, newNode);
-            return document.WithSyntaxRoot(newRoot);
-        }
-
-        private async Task<Document> ModifyExpression(Document document, SyntaxNode root, SyntaxNode nodeToChange)
-        {
-            string newTokenText = $"{nodeToChange.DescendantTokens().FirstOrDefault()} is null";
-
             SyntaxToken newToken = SyntaxFactory.Literal(default(SyntaxTriviaList), newTokenText, newTokenText, default(SyntaxTriviaList));
             SyntaxNode newNode = SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, newToken);
             SyntaxNode newRoot = root.ReplaceNode(nodeToChange, newNode);
