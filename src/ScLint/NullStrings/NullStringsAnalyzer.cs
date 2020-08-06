@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
+using System.Linq;
 
 namespace NullStrings
 {
@@ -25,7 +26,10 @@ namespace NullStrings
 
         private static void AnalyzeNode(SyntaxNodeAnalysisContext context)
         {
-            context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation()));
+            if (context.Node.DescendantNodes().Any(x => x.IsKind(SyntaxKind.NullLiteralExpression)))
+            {
+                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation()));
+            }
         }
     }
 }
