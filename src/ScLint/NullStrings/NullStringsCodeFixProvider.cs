@@ -37,10 +37,13 @@ namespace NullStrings
             bool negation = nodeToChange.DescendantTokens().Any(x => x.IsKind(SyntaxKind.ExclamationEqualsToken));
 
             var semanticModel = context.Document.GetSemanticModelAsync().Result;
-            var investigatedToken = nodeToChange.DescendantNodes().OfType<IdentifierNameSyntax>().FirstOrDefault();
-            string typeName = semanticModel.GetTypeInfo(investigatedToken).Type.Name;
 
-            if (typeName == typeof(String).Name.ToString())
+            var investigatedToken = nodeToChange.DescendantNodes().OfType<IdentifierNameSyntax>().FirstOrDefault();
+            string typeName = $"{semanticModel.GetTypeInfo(investigatedToken).Type.ContainingNamespace.Name}.{semanticModel.GetTypeInfo(investigatedToken).Type.Name}";
+
+            var typeNameObject = Type.GetType(typeName);
+
+            if (typeName == typeof(String).FullName)
             {
                 context.RegisterCodeFix(
                     CodeAction.Create(

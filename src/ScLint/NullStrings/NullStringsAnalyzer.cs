@@ -1,8 +1,10 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
+using System;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Reflection;
 
 namespace NullStrings
 {
@@ -26,7 +28,17 @@ namespace NullStrings
 
         private static void AnalyzeNode(SyntaxNodeAnalysisContext context)
         {
-            if (context.Node.DescendantNodes().Any(x => x.IsKind(SyntaxKind.NullLiteralExpression)))
+            var nodeToCheck = context.Node.DescendantNodes().FirstOrDefault();
+            string nodeTypeName = $"{context.SemanticModel.GetTypeInfo(nodeToCheck).Type.ContainingNamespace}.{context.SemanticModel.GetTypeInfo(nodeToCheck).Type.Name}";
+
+            Type nodeType = Type.GetType(nodeTypeName);
+
+            if (nodeType is null)
+            {
+                nodeType = Type.GetType("System.Object");
+            }
+
+            if (context.Node.DescendantNodes().Any(x => x.IsKind(SyntaxKind.NullLiteralExpression)) && (nodeType.FullName == typeof(Nullable).FullName || !nodeType.GetTypeInfo().IsValueType))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation()));
             }
